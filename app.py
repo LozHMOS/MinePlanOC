@@ -65,17 +65,17 @@ with tab1:
     st.subheader("Upload Daily Drone Imagery")
     st.info("Upload one or more geotagged or ortho-rectified drone images.")
     
-    # Demonstration imagery loader
+    # Demonstration imagery loader – now using the correct .jpeg filename
     if st.button("Load Demonstration Open Cut Mine Imagery"):
         try:
-            demo_img = Image.open("demo_open_cut_mine.jpg")
+            demo_img = Image.open("demo_open_cut_mine.jpeg")
             yesterday = str(date.today() - timedelta(days=1))
             today_str = str(date.today())
             st.session_state.images[yesterday] = demo_img.copy()
             st.session_state.images[today_str] = demo_img.copy()
             st.success("Demonstration imagery loaded successfully as Day 0 (Yesterday) and Day 1 (Today). You can now explore the comparison and management tabs.")
         except FileNotFoundError:
-            st.error("Please ensure the file 'demo_open_cut_mine.jpg' is in the same folder as this app.")
+            st.error("Please ensure the file 'demo_open_cut_mine.jpeg' is in the same folder as this app.py file.")
         except Exception as e:
             st.error(f"Error loading demonstration image: {e}")
     
@@ -97,6 +97,7 @@ with tab1:
         selected_date = st.selectbox("View imagery for", options=list(st.session_state.images.keys()))
         st.image(st.session_state.images[selected_date], caption=f"Drone imagery – {selected_date}", use_container_width=True)
 
+# The rest of the code (tabs 2–5) remains unchanged from the previous version
 with tab2:
     st.subheader("Mark Assets and Points of Interest")
     st.info("Select a day and place markers directly on the imagery using the form on the right.")
