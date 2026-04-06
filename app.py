@@ -13,7 +13,7 @@ st.set_page_config(
 )
 
 st.title("MOS MinePlan OC")
-st.markdown("**Open Cut Coal Mine Planning Tool** – Complete demonstration with all value-add features for management review")
+st.markdown("**Open Cut Coal Mine Planning Tool** – Complete demonstration with all value add features for management review")
 
 # Sidebar – simple authentication simulation
 st.sidebar.header("Mine Site Access")
@@ -63,7 +63,22 @@ tab1, tab2, tab3, tab4, tab5 = st.tabs([
 
 with tab1:
     st.subheader("Upload Daily Drone Imagery")
-    st.info("Upload one or more geotagged or ortho-rectified drone images. For the full demonstration, upload the two images you received as Day 0 and Day 1.")
+    st.info("Upload one or more geotagged or ortho-rectified drone images.")
+    
+    # Demonstration imagery loader
+    if st.button("Load Demonstration Open Cut Mine Imagery"):
+        try:
+            demo_img = Image.open("demo_open_cut_mine.jpg")
+            yesterday = str(date.today() - timedelta(days=1))
+            today_str = str(date.today())
+            st.session_state.images[yesterday] = demo_img.copy()
+            st.session_state.images[today_str] = demo_img.copy()
+            st.success("Demonstration imagery loaded successfully as Day 0 (Yesterday) and Day 1 (Today). You can now explore the comparison and management tabs.")
+        except FileNotFoundError:
+            st.error("Please ensure the file 'demo_open_cut_mine.jpg' is in the same folder as this app.")
+        except Exception as e:
+            st.error(f"Error loading demonstration image: {e}")
+    
     uploaded_files = st.file_uploader(
         "Choose drone imagery files (JPG/PNG)",
         type=["jpg", "jpeg", "png"],
@@ -86,7 +101,7 @@ with tab2:
     st.subheader("Mark Assets and Points of Interest")
     st.info("Select a day and place markers directly on the imagery using the form on the right.")
     if not st.session_state.images:
-        st.warning("Upload imagery in the first tab first.")
+        st.warning("Upload imagery in the first tab first (or use the demonstration button above).")
     else:
         mark_date = st.selectbox("Select day to annotate", options=list(st.session_state.images.keys()), key="mark_date")
         current_img = st.session_state.images[mark_date]
@@ -124,7 +139,7 @@ with tab3:
     st.subheader("Compare Daily Imagery")
     st.info("Side-by-side view with progress highlights – core feature for reviewing change over 24 hours.")
     if len(st.session_state.images) < 2:
-        st.warning("Upload at least two days of imagery to enable comparison.")
+        st.warning("Load the demonstration imagery or upload at least two days to enable comparison.")
     else:
         dates = list(st.session_state.images.keys())
         col1, col2 = st.columns(2)
@@ -179,7 +194,7 @@ with tab5:
 
     with mgmt_tab2:
         st.subheader("Automated Progress Tracking – Plan vs Actual")
-        st.info("Upload the two matched drone images (Day 0 and Day 1) in Tab 1. The overlay below shows 24-hour change.")
+        st.info("The demonstration imagery (Day 0 and Day 1) is already loaded above. The overlay below shows the workflow.")
         if len(st.session_state.images) >= 2:
             dates = list(st.session_state.images.keys())
             left = st.session_state.images[dates[0]]
@@ -188,10 +203,10 @@ with tab5:
             with colA:
                 st.image(left, caption="Yesterday – Day 0", use_container_width=True)
             with colB:
-                st.image(right, caption="Today – Day 1 (progressed)", use_container_width=True)
-            st.success("Visual difference detected: draglines advanced, haul trucks repositioned, coal train moved forward – exactly as required for the demonstration.")
+                st.image(right, caption="Today – Day 1", use_container_width=True)
+            st.success("Visual difference workflow ready (in a real deployment different daily flights would be used).")
         else:
-            st.warning("Upload Day 0 and Day 1 imagery in Tab 1 to see the live overlay.")
+            st.warning("Load the demonstration imagery first.")
 
     with mgmt_tab3:
         st.subheader("Digital Shift Handover")
